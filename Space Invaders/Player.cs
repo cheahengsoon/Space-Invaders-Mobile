@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
@@ -11,6 +12,8 @@ namespace Space_Invaders
         // Variables
         private Image playerSprite;
         private Image playerBullet;
+        private RadialController Controller;
+        private RadialControllerMenuItem MenuItem;
 
         private BitmapImage playerBitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/Sprites/player.png"));
         private BitmapImage invaderKilledImage = new BitmapImage(new Uri("ms-appx:///Assets/Sprites/explosion.png"));
@@ -48,6 +51,24 @@ namespace Space_Invaders
 
             playerSprite.Source = playerBitmapImage;
             canvas.Children.Add(playerSprite);
+
+            Controller = RadialController.CreateForCurrentView();
+            Controller.RotationResolutionInDegrees = 2;
+            Controller.RotationChanged += Controller_RotationChanged;
+            Controller.ButtonClicked += Controller_ButtonClicked;
+
+            MenuItem = RadialControllerMenuItem.CreateFromKnownIcon("SpaceInvaders", RadialControllerMenuKnownIcon.PenType);
+            Controller.Menu.Items.Add(MenuItem);
+        }
+
+        private void Controller_ButtonClicked(RadialController sender, RadialControllerButtonClickedEventArgs args)
+        {
+            isShooting = true;
+        }
+
+        private void Controller_RotationChanged(RadialController sender, RadialControllerRotationChangedEventArgs args)
+        {
+            Canvas.SetLeft(playerSprite, Canvas.GetLeft(playerSprite) + 2 * args.RotationDeltaInDegrees);
         }
 
         //Draw and update all object for every game frame
